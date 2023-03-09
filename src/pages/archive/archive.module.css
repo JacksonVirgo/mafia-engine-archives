@@ -1,0 +1,16 @@
+.main {
+	padding: 2rem;
+}
+
+.messageContent {
+	padding-left: 1rem;
+}
+
+.messageRoot {
+	padding: 1rem;
+	border: 1px solid black;
+}
+
+.channelStats {
+	padding-left: 1rem;
+}
