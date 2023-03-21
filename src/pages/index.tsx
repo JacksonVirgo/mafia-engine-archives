@@ -9,6 +9,8 @@ const HomePage: NextPage = () => {
 				<meta name="description" content="Mel is superior" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
+
+			<div>Not Here Yet</div>
 		</>
 	);
 };
