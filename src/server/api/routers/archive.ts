@@ -2,6 +2,12 @@ import { z } from 'zod';
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from '~/server/api/trpc';
 
+function extractMentionedUserId(mention: string): string | undefined {
+	const regex = /<@(\S+)>/;
+	const match = mention.match(regex);
+	return match ? match[1] : undefined;
+}
+
 export const archiveRouter = createTRPCRouter({
 	getChannel: publicProcedure.input(z.object({ channelId: z.string().nullish(), take: z.number().nullish(), skip: z.number().nullish() })).query(async ({ ctx, input }) => {
 		const { channelId, take, skip } = input;
@@ -39,6 +45,24 @@ export const archiveRouter = createTRPCRouter({
 		} catch (err) {
 			console.log(err);
 			return { channel: null, error: 'Unexpected error' };
+		}
+	}),
+
+	getUser: publicProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
+		const extract = extractMentionedUserId(input.userId);
+
+		try {
+			if (!extract) throw Error();
+			const user = await ctx.prisma.discordAccount.findFirst({
+				where: {
+					discordId: extract,
+				},
+			});
+
+			if (!user) return { user: null, status: 404, input: input.userId, formatted: extract };
+			return { user, status: 200, input: input.userId, formatted: extract };
+		} catch (err) {
+			return { user: null, status: 500, input: input.userId, formatted: extract };
 		}
 	}),
 });

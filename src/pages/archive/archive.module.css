@@ -14,3 +14,12 @@
 .channelStats {
 	padding-left: 1rem;
 }
+
+.basictext {
+	color: red;
+}
+
+.mention {
+	color: cyan;
+	background-color: blueviolet;
+}

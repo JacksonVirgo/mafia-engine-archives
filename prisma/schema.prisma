@@ -68,6 +68,7 @@ model VerificationToken {
 model DiscordAccount {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   discordId String    @unique
+  username  String
   messages  Message[]
 }
 
@@ -103,9 +104,9 @@ model Game {
 }
 
 model Channel {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  game   Game   @relation(fields: [gameId], references: [id])
-  gameId String @db.ObjectId
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  game   Game?   @relation(fields: [gameId], references: [id])
+  gameId String? @db.ObjectId
 
   guildId   String
   channelId String  @unique
@@ -134,6 +135,7 @@ model Message {
   createdAt    DateTime
   editedAt     DateTime?
   cleanContent String?
+  rawContent   String?
   threads      Thread[]
   pinned       Boolean   @default(false)
 
