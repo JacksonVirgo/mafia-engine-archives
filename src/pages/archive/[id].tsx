@@ -1,11 +1,11 @@
 import styles from './archive.module.css';
 import { type NextPage } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import { api } from '~/utils/api';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Channel, DiscordAccount, Message } from '@prisma/client';
+import TextMessage from '~/components/Message';
 
 type MessageData = (Message & {
 	author: DiscordAccount;
@@ -14,7 +14,7 @@ type MessageData = (Message & {
 const ChannelArchive: NextPage = () => {
 	const router = useRouter();
 	const { id } = router.query;
-	const pageData = api.archive.getChannel.useQuery({ channelId: id ? (id as string) : '', take: 25, skip: 0 });
+	const pageData = api.archive.getChannel.useQuery({ channelId: id ? (id as string) : '', take: 500, skip: 0 });
 	const [channel, setChannel] = useState<Channel>();
 	const [messages, setMessages] = useState<MessageData>([]);
 
@@ -38,12 +38,13 @@ const ChannelArchive: NextPage = () => {
 			<main className={styles.main}>
 				<div className={styles.channelStats}>
 					<div>CHANNEL NAME: {channel?.name ? `#${channel.name}` : 'LOADING'}</div>
+					<div>{id}</div>
 				</div>
 				{messages.map((v) => {
 					return (
 						<div key={v.messageId} className={styles.messageRoot}>
-							<div>USER ID - {v.author.discordId}</div>
-							<div className={styles.messageContent}>{v.cleanContent}</div>
+							<div>USER ID - {v.author.username}</div>
+							<TextMessage text={v.rawContent ?? ''} />
 						</div>
 					);
 				})}
