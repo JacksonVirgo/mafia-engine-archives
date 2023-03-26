@@ -1,5 +1,7 @@
 .main {
 	padding: 2rem;
+	background-color: #313338;
+	color: white;
 }
 
 .messageContent {
@@ -9,17 +11,54 @@
 .messageRoot {
 	padding: 1rem;
 	border: 1px solid black;
+
+	display: flex;
+	flex-direction: row;
+}
+
+.contentsection {
+	flex-grow: 1;
+}
+
+.avatarsection {
+	flex-shrink: 1;
+	padding: 0.25rem;
+	padding-right: 0.5rem;
+}
+
+.avatar {
+	border-radius: 100%;
 }
 
 .channelStats {
 	padding-left: 1rem;
 }
 
-.basictext {
-	color: red;
+.mention {
+	background-color: #5865f2;
+	border-radius: 5px;
 }
 
-.mention {
-	color: cyan;
-	background-color: blueviolet;
+.content {
+	color: white;
+}
+.content > * {
+	padding: 1px;
+}
+
+/* USERNAME AREA */
+.usernamebracket {
+	display: flex;
+	flex-direction: row;
+	gap: 1rem;
+
+	align-items: center;
+}
+.username {
+	color: white;
+	font-weight: 900;
+}
+.timestamp {
+	color: gray;
+	font-size: small;
 }

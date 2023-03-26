@@ -1,59 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '~/utils/api';
+import { Channel, DiscordAccount, Message } from '@prisma/client';
+import Content from './message/Content';
 
-interface UserMentionProps {
-	userId: string;
-}
-const UserMention = ({ userId }: UserMentionProps) => {
-	const userData = api.archive.getUser.useQuery({ userId });
-	const [displayName, setDisplayName] = useState(userId);
-
-	useEffect(() => {
-		if (userData.isFetched) {
-			console.log('IS FETCHEDW');
-			console.log(userData.data);
-			const user = userData.data?.user;
-			if (user) {
-				console.log(user.username);
-				setDisplayName(`@${user.username ?? userId}`);
-			} else {
-				setDisplayName('@Unknown User');
-			}
-		}
-	}, [userData]);
-
-	return <span style={{ backgroundColor: 'cyan' }}>{displayName}</span>;
-};
+import styles from '../pages/archive/archive.module.css';
+import Image from 'next/image';
 
 interface MessageProps {
-	text: string;
+	msg: Message & {
+		author: DiscordAccount;
+	};
 }
 
-const Message: React.FC<MessageProps> = ({ text }) => {
-	const regex = /<@(\S+)>/g;
-	const matches = [...text.matchAll(regex)];
+function convertTimestamp(time: Date): string {
+	const formattedDate = time.getDate() + '/' + time.getMonth() + 1 + '/' + time.getFullYear();
+	const formattedTime = time.getHours() + ':' + time.getMinutes();
 
-	let currentIndex = 0;
-	const renderedText = matches.map((match, index) => {
-		const matchIndex = match.index || 0;
-		const matchText = match[0];
-		const matchId = match[1];
+	return formattedDate + ' ' + formattedTime;
+}
 
-		const textBeforeMatch = text.slice(currentIndex, matchIndex);
-		currentIndex = matchIndex + matchText.length;
+const Message: React.FC<MessageProps> = ({ msg }) => {
+	const [date, setDate] = useState(convertTimestamp(msg.createdAt));
+	const [avatar, setAvatar] = useState(msg.author.avatarUrl ?? 'https://cdn.discordapp.com/avatars/181373580716539904/41ed47c71315e75fca9dfcb172ba0bf5.png');
 
-		return (
-			<React.Fragment key={index}>
-				<span>{textBeforeMatch}</span>
-				<UserMention userId={matchText} />
-			</React.Fragment>
-		);
-	});
-
-	const textAfterLastMatch = text.slice(currentIndex);
-	renderedText.push(<span key={matches.length}>{textAfterLastMatch}</span>);
-
-	return <div>{renderedText}</div>;
+	return (
+		<div key={msg.messageId} className={styles.messageRoot}>
+			<div className={styles.avatarsection}>
+				<Image className={styles.avatar} src={avatar} width={40} height={40} alt="" />
+			</div>
+			<div className={styles.contentsection}>
+				<div className={styles.usernamebracket}>
+					<span className={styles.username}>{msg.author.username}</span>
+					<span className={styles.timestamp}>{date}</span>
+				</div>
+				<Content text={msg.rawContent ?? ''} />
+			</div>
+		</div>
+	);
 };
 
 export default Message;

@@ -5,7 +5,8 @@ import { api } from '~/utils/api';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Channel, DiscordAccount, Message } from '@prisma/client';
-import TextMessage from '~/components/Message';
+import TextMessage from '~/components/message/Content';
+import MessageComp from '~/components/Message';
 
 type MessageData = (Message & {
 	author: DiscordAccount;
@@ -41,12 +42,7 @@ const ChannelArchive: NextPage = () => {
 					<div>{id}</div>
 				</div>
 				{messages.map((v) => {
-					return (
-						<div key={v.messageId} className={styles.messageRoot}>
-							<div>USER ID - {v.author.username}</div>
-							<TextMessage text={v.rawContent ?? ''} />
-						</div>
-					);
+					return <MessageComp msg={v} />;
 				})}
 			</main>
 		</>

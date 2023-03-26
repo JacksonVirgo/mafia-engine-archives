@@ -68,6 +68,7 @@ model VerificationToken {
 model DiscordAccount {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   discordId String    @unique
+  avatarUrl String?
   username  String
   messages  Message[]
 }
