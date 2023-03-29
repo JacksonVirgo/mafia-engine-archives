@@ -2,21 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { api } from '~/utils/api';
 import styles from '../../pages/archive/archive.module.css';
 
-interface UserMentionProps {
-	userId: string;
+interface IDProps {
+	id: string;
 }
-const UserMention = ({ userId }: UserMentionProps) => {
-	const userData = api.archive.getUser.useQuery({ userId });
-	const [displayName, setDisplayName] = useState(userId);
+
+const UserMention = ({ id }: IDProps) => {
+	const userData = api.archive.getUser.useQuery({ userId: id });
+	const [displayName, setDisplayName] = useState(id);
 
 	useEffect(() => {
 		if (userData.isFetched) {
-			console.log('IS FETCHEDW');
-			console.log(userData.data);
 			const user = userData.data?.user;
 			if (user) {
-				console.log(user.username);
-				setDisplayName(`@${user.username ?? userId}`);
+				setDisplayName(`@${user.username ?? id}`);
 			} else {
 				setDisplayName('@Unknown User');
 			}
@@ -31,11 +29,12 @@ interface MessageProps {
 }
 
 const Message: React.FC<MessageProps> = ({ text }) => {
-	const regex = /<@(\S+)>/g;
-	const matches = [...text.matchAll(regex)];
+	const userMentionRegex = /<@(\S+)>/g;
+	const userMentionMatches = [...text.matchAll(userMentionRegex)];
+	const emojiRegex = /<:([a-zA-Z0-9_]+):(\d+)>/g;
 
 	let currentIndex = 0;
-	const renderedText = matches.map((match, index) => {
+	const renderedText = userMentionMatches.map((match, index) => {
 		const matchIndex = match.index || 0;
 		const matchText = match[0];
 		const matchId = match[1];
@@ -46,13 +45,13 @@ const Message: React.FC<MessageProps> = ({ text }) => {
 		return (
 			<React.Fragment key={index}>
 				<span>{textBeforeMatch}</span>
-				<UserMention userId={matchText} />
+				<UserMention id={matchText} />
 			</React.Fragment>
 		);
 	});
 
 	const textAfterLastMatch = text.slice(currentIndex);
-	renderedText.push(<span key={matches.length}>{textAfterLastMatch}</span>);
+	renderedText.push(<span key={userMentionMatches.length}>{textAfterLastMatch}</span>);
 
 	return <div className={styles.content}>{renderedText}</div>;
 };
